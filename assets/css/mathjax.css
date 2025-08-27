@@ -1,0 +1,25 @@
+mjx-container,
+mjx-container mjx-math,
+mjx-container mjx-math mjx-mrow,
+.MathJax,
+.MathJax_Display {
+    font-family: sans-serif !important;
+}
+
+mjx-container[jax="CHTML"] {
+    font-family: sans-serif !important;
+}
+
+mjx-mi {
+    font-style: italic !important;
+}
+
+/* Keep operators upright */
+mjx-mo {
+    font-style: normal !important;
+}
+
+/* Numbers should be upright */
+mjx-mn {
+    font-style: normal !important;
+}

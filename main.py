@@ -5,68 +5,75 @@ import matplotlib.colors as mcolors
 from pyscript import document, display, when
 import js
 
-# --- Grid and Figure Setup ---
-x = np.linspace(-1.75, 1.75, 201)
-z = np.linspace(-1, 3, 401)
-X, Z = np.meshgrid(x, z)
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-fig.subplots_adjust(wspace=0.3)
+def initialize_figure():
+    """Initialize the figure and set the global variables."""
+    global fig, axes, im_psi, im_Q, quiv, slope_line_psi, slope_line_Q, subset, x, z
+    global X, Z
 
-# Create placeholder artists.
-kwargs = {"cmap": "RdBu_r", "origin": "lower", "aspect": "auto", "zorder": 0}
-kwargs.update({"extent": [x.min(), x.max(), z.min(), z.max()]})
-cmap = plt.get_cmap(kwargs["cmap"])
-Q_levels = np.linspace(-1, 1, 21)
-Q_norm = mcolors.BoundaryNorm(Q_levels, ncolors=cmap.N, extend="both")
-psi_max = 0.5
-psi_levels = np.linspace(-psi_max, psi_max, 21)
-psi_norm = mcolors.BoundaryNorm(psi_levels, ncolors=cmap.N, extend="both")
+    x = np.linspace(-1.75, 1.75, 201)
+    z = np.linspace(-1, 3, 401)
+    X, Z = np.meshgrid(x, z)
 
-# Plot psi
-im_psi = axes[0].imshow(np.zeros_like(Z), **kwargs, norm=psi_norm)
-psi_cbar = fig.colorbar(im_psi, ax=axes[0], extend="both")
-psi_cbar.set_label(r"$\psi$ [-]")
-psi_cbar.set_ticks(np.linspace(-psi_max, psi_max, 11))
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    fig.subplots_adjust(wspace=0.3)
 
-# Plot Q
-im_Q = axes[1].imshow(np.zeros_like(Z), **kwargs, norm=Q_norm)
-Q_cbar = fig.colorbar(im_Q, ax=axes[1], extend="both")
-Q_cbar.set_label(r"$Q$ [-]")
-Q_cbar.set_ticks(np.linspace(-1, 1, 11))
+    # Create placeholder artists.
+    kwargs = {"cmap": "RdBu_r", "origin": "lower", "aspect": "auto", "zorder": 0}
+    kwargs.update({"extent": [x.min(), x.max(), z.min(), z.max()]})
+    cmap = plt.get_cmap(kwargs["cmap"])
+    Q_levels = np.linspace(-1, 1, 21)
+    Q_norm = mcolors.BoundaryNorm(Q_levels, ncolors=cmap.N, extend="both")
+    psi_max = 0.5
+    psi_levels = np.linspace(-psi_max, psi_max, 21)
+    psi_norm = mcolors.BoundaryNorm(psi_levels, ncolors=cmap.N, extend="both")
 
-# Quiver plot
-step = 20
-subset = (slice(None, None, step), slice(None, None, step))
-dummy_wind = np.zeros_like(X)
-quiv_args = [X[subset], Z[subset], dummy_wind[subset], dummy_wind[subset]]
-quiv_kwargs = {"color": "k", "scale": 2.5, "width": 0.006, "angles": "xy"}
-quiv = axes[0].quiver(*quiv_args, **quiv_kwargs, zorder=2)
-axes[0].quiverkey(quiv, 0.80, 1.05, 0.2, r"0.2 [-]", labelpos="E", coordinates="axes")
+    # Plot psi
+    im_psi = axes[0].imshow(np.zeros_like(Z), **kwargs, norm=psi_norm)
+    psi_cbar = fig.colorbar(im_psi, ax=axes[0], extend="both")
+    psi_cbar.set_label(r"$\psi$ [-]")
+    psi_cbar.set_ticks(np.linspace(-psi_max, psi_max, 11))
 
-# Plot the slope line
-dark_brown = tuple([c * 0.5 for c in mcolors.to_rgb("tab:brown")])
-slope_line_psi = axes[0].plot(x, x * 0, color=dark_brown, zorder=1)[0]
-slope_line_Q = axes[1].plot(x, x * 0, color=dark_brown, zorder=1)[0]
+    # Plot Q
+    im_Q = axes[1].imshow(np.zeros_like(Z), **kwargs, norm=Q_norm)
+    Q_cbar = fig.colorbar(im_Q, ax=axes[1], extend="both")
+    Q_cbar.set_label(r"$Q$ [-]")
+    Q_cbar.set_ticks(np.linspace(-1, 1, 11))
 
-for i, ax in enumerate(axes):
-    ax.set_ylim(-1, 2)
-    ax.set_xlim(-1.5, 1.5)
-    ax.set_xlabel(r"$x$ [-]")
-    if i == 0:
-        ax.set_ylabel(r"$z$ [-]")
-    ax.set_facecolor("tab:brown")
-    ax.set_aspect("equal")
+    # Quiver plot
+    step = 20
+    subset = (slice(None, None, step), slice(None, None, step))
+    dummy_wind = np.zeros_like(X)
+    quiv_args = [X[subset], Z[subset], dummy_wind[subset], dummy_wind[subset]]
+    quiv_kwargs = {"color": "k", "scale": 2.5, "width": 0.006, "angles": "xy"}
+    quiv = axes[0].quiver(*quiv_args, **quiv_kwargs, zorder=2)
+    axes[0].quiverkey(
+        quiv, 0.80, 1.05, 0.2, r"0.2 [-]", labelpos="E", coordinates="axes"
+    )
 
-axes[0].set_title(r"$\psi$ [-]")
-axes[1].set_title(r"$Q$ [-]")
+    # Plot the slope line
+    dark_brown = tuple([c * 0.5 for c in mcolors.to_rgb("tab:brown")])
+    slope_line_psi = axes[0].plot(x, x * 0, color=dark_brown, zorder=1)[0]
+    slope_line_Q = axes[1].plot(x, x * 0, color=dark_brown, zorder=1)[0]
 
-fig.patch.set_facecolor("#E6E6E6")
-# fig.tight_layout()
-fig.suptitle(r"", y=0.975)
+    for i, ax in enumerate(axes):
+        ax.set_ylim(-1, 2)
+        ax.set_xlim(-1.5, 1.5)
+        ax.set_xlabel(r"$x$ [-]")
+        if i == 0:
+            ax.set_ylabel(r"$z$ [-]")
+        ax.set_facecolor("tab:brown")
+        ax.set_aspect("equal")
 
-# --- Display the empty figure template on the page IMMEDIATELY ---
-display(fig, target="plot-output")
+    axes[0].set_title(r"$\psi$ [-]")
+    axes[1].set_title(r"$Q$ [-]")
+
+    fig.patch.set_facecolor("#E6E6E6")
+    # fig.tight_layout()
+    fig.suptitle(r"", y=0.975)
+
+    # --- Display the empty figure template on the page IMMEDIATELY ---
+    display(fig, target="plot-output")
 
 
 @when("input", "#f_omega_slider, #alpha_omega_slider, #N_omega_slider, #M_slider")
@@ -136,4 +143,5 @@ def update_time(event):
     display(fig, target="plot-output", append=False)
 
 
+initialize_figure()
 update_params(None)
