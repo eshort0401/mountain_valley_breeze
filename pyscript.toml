@@ -1,3 +1,3 @@
-name = "Simple Panel"
-description = "A basic Panel application to be used with PyScript."
+name = "Mountain-valley Breeze Toy-Model"
+description = "Toy model of the mountain-valley breeze."
 packages = ["numpy", "matplotlib"]

@@ -143,5 +143,15 @@ def update_time(event):
     display(fig, target="plot-output", append=False)
 
 
+def hide_loading_screen():
+    """Hide loading screen and show main content"""
+    loading_screen = document.getElementById("loading-screen")
+    main_content = document.getElementById("main-content")
+
+    loading_screen.style.display = "none"
+    main_content.style.display = "block"
+
+
 initialize_figure()
 update_params(None)
+hide_loading_screen()
